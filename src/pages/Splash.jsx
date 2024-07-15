@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 
-const logoImg = require('../assets/wod_logo.png');
+const logoImg = require('../assets/splash_logo.png');
 
 const Splash = ({ navigation }) => {
     useEffect(() => {
