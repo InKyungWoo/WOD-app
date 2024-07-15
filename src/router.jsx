@@ -1,6 +1,7 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import CustomBottomTab from './components/CustomBottomTab';
 
 // 초기 화면
 import Splash from './pages/Splash';
@@ -15,17 +16,19 @@ import MyPage from './pages/main/MyPage';
 // 상세 화면
 import DmDetail from './pages/details/DmDetail';
 
+const renderTabBar = props => <CustomBottomTab {...props} />;
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 const MainTab = () => {
     return (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
-            <Tab.Screen name="FeedHome" component={FeedHome} />
-            <Tab.Screen name="SearchFeed" component={SearchFeed} />
-            <Tab.Screen name="PostFeed" component={PostFeed} />
-            <Tab.Screen name="Dm" component={DmList} />
-            <Tab.Screen name="MyPage" component={MyPage} />
+        <Tab.Navigator tabBar={renderTabBar} screenOptions={{ headerShown: false }}>
+            <Tab.Screen name="홈" component={FeedHome} />
+            <Tab.Screen name="검색" component={SearchFeed} />
+            <Tab.Screen name="추가" component={PostFeed} />
+            <Tab.Screen name="DM" component={DmList} />
+            <Tab.Screen name="마이페이지" component={MyPage} />
         </Tab.Navigator>
     );
 };
