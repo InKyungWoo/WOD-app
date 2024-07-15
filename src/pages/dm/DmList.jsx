@@ -61,7 +61,7 @@ const DmList = () => {
 
     return (
         <SafeAreaView style={{ flex: 1 }}>
-            <BasicHeader />
+            <BasicHeader title={'Direct Messages'} />
             <View style={styles.container}>
                 <FlatList
                     data={dummyChats}
