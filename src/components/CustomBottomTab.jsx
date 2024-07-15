@@ -5,7 +5,8 @@ const homeOn = require('../assets/icons/bottomtab/home_on.png');
 const homeOff = require('../assets/icons/bottomtab/home_off.png');
 const searchOn = require('../assets/icons/bottomtab/search_on.png');
 const searchOff = require('../assets/icons/bottomtab/search_off.png');
-const addOn = require('../assets/icons/bottomtab/add_circle_off.png');
+const addOn = require('../assets/icons/bottomtab/add_circle_on.png');
+const addOff = require('../assets/icons/bottomtab/add_circle_off.png');
 const chatOn = require('../assets/icons/bottomtab/chat_on.png');
 const chatOff = require('../assets/icons/bottomtab/chat_off.png');
 const personOn = require('../assets/icons/bottomtab/person_on.png');
@@ -47,7 +48,7 @@ const CustomBottomTab = ({ state, navigation, insets, descriptors }) => {
                         case '검색':
                             return bool ? searchOn : searchOff;
                         case '추가':
-                            return bool ? addOn : addOn;
+                            return bool ? addOn : addOff;
                         case 'DM':
                             return bool ? chatOn : chatOff;
                         default:

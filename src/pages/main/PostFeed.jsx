@@ -57,6 +57,7 @@ const PostFeed = ({ navigation }) => {
                             width: 20,
                             height: 20,
                             backgroundColor: '#FFF',
+                            borderRadius: 20,
                             zIndex: 2,
                         }}>
                         <Image source={checked} style={{ width: 20, height: 20 }} />
@@ -81,11 +82,9 @@ const PostFeed = ({ navigation }) => {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Image source={backArrow} style={{ width: 36, height: 36 }} />
                 </TouchableOpacity>
-                <Text style={{ fontSize: 18, color: '#3C215B', fontWeight: 'bold' }}>
-                    오늘의 운동
-                </Text>
+
                 <TouchableOpacity>
-                    <Text style={{ fontSize: 15, color: '#0EAEC4', fontWeight: 'bold' }}>다음</Text>
+                    <Text style={{ fontSize: 15, color: '#5762D5', fontWeight: 'bold' }}>다음</Text>
                 </TouchableOpacity>
             </View>
 

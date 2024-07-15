@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 const searchIcon = require('../../assets/icons/search.png');
+const hashtagIcon = require('../../assets/icons/hashtag.png');
 
 const duumy_search = [
     {
@@ -89,10 +90,10 @@ const SearchFeed = ({ navigation }) => {
                         onPress={() => navigation.navigate('SearchList')}
                         style={styles.searchWrapper}>
                         <TouchableOpacity style={styles.searchIconStyle}>
-                            <Image source={searchIcon} style={{ width: 24, height: 24 }} />
+                            <Image source={hashtagIcon} style={{ width: 24, height: 24 }} />
                         </TouchableOpacity>
                         <Text allowFontScaling={false} style={styles.inputStyle}>
-                            검색어를 입력하세요.
+                            키워드를 입력하세요.
                         </Text>
                     </TouchableOpacity>
                 </View>

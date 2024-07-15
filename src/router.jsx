@@ -15,6 +15,8 @@ import DmList from './pages/main/DmList';
 import MyPage from './pages/main/MyPage';
 
 import DmDetail from './pages/details/DmDetail';
+import Follower from './pages/details/Follower';
+import Settings from './pages/details/Settings';
 
 const renderTabBar = props => <CustomBottomTab {...props} />;
 
@@ -51,6 +53,8 @@ const Router = () => {
             <Stack.Screen name="Splash" component={Splash} />
             <Stack.Screen name="MainTab" component={MainTab} />
             <Stack.Screen name="DmDetail" component={DmDetail} />
+            <Stack.Screen name="Follower" component={Follower} />
+            <Stack.Screen name="Settings" component={Settings} />
         </Stack.Navigator>
     );
 };
