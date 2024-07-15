@@ -16,6 +16,8 @@ import DmDetail from './pages/dm/DmDetail';
 import MyPage from './pages/mypage/MyPage';
 import Follower from './pages/mypage/Follower';
 import Settings from './pages/mypage/Settings';
+import ProfileEdit from './pages/mypage/ProfileEdit';
+import AccountSetting from './pages/mypage/AccountSetting';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -64,6 +66,8 @@ const MyPageStack = () => (
         <Stack.Screen name="MyPage" component={MyPage} />
         <Stack.Screen name="Follower" component={Follower} />
         <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEdit} />
+        <Stack.Screen name="AccountSetting" component={AccountSetting} />
     </Stack.Navigator>
 );
 

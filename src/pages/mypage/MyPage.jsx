@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 
 const settingsIcon = require('../../assets/icons/settings.png');
-const myProfile = require('../../assets//images/bommy.jpeg');
+const myProfile = require('../../assets//images/tempProfile.png');
 
 // 임시 데이터
 const posts = Array(15)
@@ -35,7 +35,7 @@ const Mypage = ({ navigation }) => {
     );
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <View style={{ flex: 1 }}>
+            <View>
                 {/* 상단 헤더 */}
                 <View
                     style={{

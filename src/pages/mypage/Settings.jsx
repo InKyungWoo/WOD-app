@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     SafeAreaView,
     View,
@@ -11,7 +11,7 @@ import {
 
 import BasicHeader from '../../components/BasicHeader';
 
-const myProfile = require('../../assets/images/bommy.jpeg');
+const myProfile = require('../../assets/images/tempProfile.png');
 const myPageMenuArrow = require('../../assets/icons/myPageMenuArrow.png');
 
 const menuData = [
@@ -60,42 +60,47 @@ const Settings = ({ navigation }) => {
 
                 {/* 계정 설정 */}
                 <View style={styles.sectionContainer}>
-                    <View>
+                    <View style={styles.infoItem}>
                         <Text style={styles.labelText}>계정ID</Text>
                         <Text style={styles.valueText}>chacha_@hufs.ac.kr</Text>
                     </View>
-                    <View style={{ marginTop: 12 }}>
+                    <View style={styles.infoItem}>
                         <Text style={styles.labelText}>계정 연락처</Text>
                         <Text style={styles.valueText}>010-2357-1434</Text>
                     </View>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity
                             style={styles.editButton}
-                            onPress={() => navigation.navigate('AccountSettings')}>
+                            onPress={() => navigation.navigate('AccountSetting')}>
                             <Text style={styles.editButtonText}>계정 설정</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* 메뉴 항목들 */}
-                {menuData.map(section => (
-                    <View key={section.id} style={styles.menuSection}>
-                        <Text style={styles.menuSectionTitle}>{section.title}</Text>
-                        {section.subItems.map((item, index) => (
-                            <TouchableOpacity
-                                key={index}
-                                style={styles.menuItem}
-                                onPress={() => navigation.navigate(item.page)}>
-                                <Text style={styles.menuItemText}>{item.title}</Text>
-                                <Image
-                                    source={myPageMenuArrow}
-                                    style={styles.arrowIcon}
-                                    resizeMode="contain"
-                                />
-                            </TouchableOpacity>
-                        ))}
-                    </View>
-                ))}
+                <View style={styles.menuContainer}>
+                    {menuData.map(section => (
+                        <View key={section.id}>
+                            <View style={styles.menuSectionHeader}>
+                                <Text style={styles.menuSectionTitle}>{section.title}</Text>
+                            </View>
+                            <View style={{ borderBottomWidth: 1, borderColor: '#858fc7' }} />
+                            {section.subItems.map((item, index) => (
+                                <TouchableOpacity
+                                    key={index}
+                                    style={styles.menuItem}
+                                    onPress={() => navigation.navigate(item.page)}>
+                                    <Text style={styles.menuItemText}>{item.title}</Text>
+                                    <Image
+                                        source={myPageMenuArrow}
+                                        style={styles.arrowIcon}
+                                        resizeMode="contain"
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    ))}
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -103,56 +108,71 @@ const Settings = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     sectionContainer: {
-        padding: 16,
+        paddingVertical: 16,
+        paddingHorizontal: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F2F2F2',
     },
     buttonContainer: {
         alignItems: 'center',
-        marginTop: 16,
+        marginTop: 12,
     },
     editButton: {
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#858fc7',
         padding: 8,
         borderRadius: 4,
         alignItems: 'center',
         width: 300,
+        marginBottom: 10,
     },
     editButtonText: {
-        color: '#4F4F4F',
-        fontSize: 12,
+        color: '#FFF',
+        fontSize: 14,
+    },
+    infoItem: {
+        marginBottom: 14,
     },
     labelText: {
         fontSize: 14,
-        color: '#828282',
+        color: '#5762D5',
         marginBottom: 4,
     },
     valueText: {
         fontSize: 16,
-        color: '#333',
+        color: '#3C215B',
         fontWeight: '500',
     },
-    menuSection: {
+
+    menuContainer: {
+        paddingHorizontal: 24,
+    },
+    menuSectionHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginTop: 16,
+        marginBottom: 8,
     },
     menuSectionTitle: {
-        fontSize: 13,
+        fontSize: 14,
         fontWeight: 'bold',
-        color: '#828282',
-        marginLeft: 16,
-        marginTop: 10,
+        color: '#858fc7',
+        marginRight: 8,
+    },
+    verticalLine: {
+        height: 14,
+        width: 1,
+        backgroundColor: '#ECECEC',
     },
     menuItem: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F2F2F2',
+        paddingVertical: 10,
     },
     menuItemText: {
         fontSize: 16,
-        color: '#333',
+        fontWeight: '600',
+        color: '#3C215B',
     },
     arrowIcon: {
         width: 20,
