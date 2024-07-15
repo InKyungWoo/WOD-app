@@ -10,10 +10,10 @@ import Splash from './pages/Splash';
 import FeedHome from './pages/main/FeedHome';
 import PostFeed from './pages/main/PostFeed';
 import SearchFeed from './pages/main/SearchFeed';
+import SearchList from './pages/details/SearchList';
 import DmList from './pages/main/DmList';
 import MyPage from './pages/main/MyPage';
 
-// 상세 화면
 import DmDetail from './pages/details/DmDetail';
 
 const renderTabBar = props => <CustomBottomTab {...props} />;
@@ -21,11 +21,23 @@ const renderTabBar = props => <CustomBottomTab {...props} />;
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
+const SearchTab = () => {
+    return (
+        <Stack.Navigator
+            screenOptions={{
+                headerShown: false,
+            }}>
+            <Stack.Screen name="SearchFeed" component={SearchFeed} />
+            <Stack.Screen name="SearchList" component={SearchList} />
+        </Stack.Navigator>
+    );
+};
+
 const MainTab = () => {
     return (
         <Tab.Navigator tabBar={renderTabBar} screenOptions={{ headerShown: false }}>
             <Tab.Screen name="홈" component={FeedHome} />
-            <Tab.Screen name="검색" component={SearchFeed} />
+            <Tab.Screen name="검색" component={SearchTab} />
             <Tab.Screen name="추가" component={PostFeed} />
             <Tab.Screen name="DM" component={DmList} />
             <Tab.Screen name="마이페이지" component={MyPage} />
