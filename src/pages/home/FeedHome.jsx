@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import CommentsModal from '../../components/CommentsModal';
+import LogoHeader from '../../components/LogoHeader';
 
 const logo = require('../../assets/logo.png');
 const heart_empty = require('../../assets/icons/heart_empty.png');
@@ -106,7 +107,7 @@ const FeedHome = () => {
                         alignItems: 'center',
                         paddingHorizontal: 16,
                         paddingVertical: 8,
-                        borderTopWidth: 1,
+                        borderTopWidth: 0.2,
                         borderColor: '#8d98d3',
                     }}>
                     <TouchableOpacity
@@ -212,21 +213,7 @@ const FeedHome = () => {
                     keyExtractor={item => item.id.toString()}
                     removeClippedSubviews
                     showsVerticalScrollIndicator={false}
-                    ListHeaderComponent={() => (
-                        <View>
-                            <View
-                                style={{
-                                    padding: 10,
-                                    flexDirection: 'row',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    // borderBottomWidth: 1,
-                                    // borderColor: '#8d98d3',
-                                }}>
-                                <Image source={logo} style={{ width: 119, height: 30 }} />
-                            </View>
-                        </View>
-                    )}
+                    ListHeaderComponent={() => <LogoHeader />}
                 />
                 <CommentsModal isVisible={isVisible} setIsVisible={setIsVisible} />
             </View>
