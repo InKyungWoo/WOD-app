@@ -29,7 +29,8 @@ const dummy_feedData = [
             'https://picsum.photos/400/400?random=2',
             'https://picsum.photos/400/400?random=3',
         ],
-        contents: '내 마음...받아줘',
+        contents: '건강한 마음, 건강한 정신 😎',
+        hashtags: ['wod', '오운완', '헬시플레져'],
         like: 37,
         likeUsers: [1, 2, 3],
         isLiked: false,
@@ -43,6 +44,7 @@ const dummy_feedData = [
             'https://picsum.photos/400/400?random=5',
         ],
         contents: '오늘의 운동 완료!',
+        hashtags: ['wod', '오운완', 'daily', '헬스'],
         like: 52,
         likeUsers: [1, 2, 3, 4],
         isLiked: false,
@@ -58,6 +60,7 @@ const dummy_feedData = [
             'https://picsum.photos/400/400?random=9',
         ],
         contents: '오늘의 OOTD',
+        hashtags: [],
         like: 89,
         likeUsers: [1, 2, 3, 4, 5],
         isLiked: false,
@@ -83,6 +86,11 @@ const FeedHome = () => {
         );
     };
 
+    const handleClickHashtag = tag => {
+        console.log(`해시태그 클릭: ${tag}`);
+        // 해시태그 클릭시 태그 검색 구현
+    };
+
     const renderCarouselItem = ({ item, index }) => {
         return <Image source={{ uri: item }} style={{ width, height: width }} resizeMode="cover" />;
     };
@@ -99,7 +107,6 @@ const FeedHome = () => {
                         paddingHorizontal: 16,
                         paddingVertical: 8,
                         borderTopWidth: 1,
-
                         borderColor: '#8d98d3',
                     }}>
                     <TouchableOpacity
@@ -108,7 +115,7 @@ const FeedHome = () => {
                             source={{ uri: item.profileImg }}
                             style={{ width: 32, height: 32 }}
                         />
-                        <Text style={{ fontSize: 16, fontWeight: '400', lineHeight: 19.97 }}>
+                        <Text style={{ fontSize: 16, fontWeight: '600', lineHeight: 19.97 }}>
                             {item.name}
                         </Text>
                     </TouchableOpacity>
@@ -162,13 +169,35 @@ const FeedHome = () => {
                             <Image source={comment} style={{ width: 32, height: 32 }} />
                         </TouchableOpacity>
                     </View>
-                    <Text>외 {item.like - 1}명이 좋아합니다.</Text>
+                    <Text style={{ fontSize: 13, color: '#4F4F4F' }}>
+                        {item.like}명이 좋아합니다
+                    </Text>
                 </View>
 
                 {/* 피드 내용 */}
-                <View style={{ marginHorizontal: 16, gap: 4, marginBottom: 24 }}>
-                    <Text style={{ fontWeight: '500' }}>{item.name}</Text>
+                <View style={{ marginHorizontal: 16, gap: 6, marginBottom: 24 }}>
+                    <Text style={{ fontWeight: '600' }}>{item.name}</Text>
                     <Text style={{ fontWeight: '400', color: '#4F4F4F' }}>{item.contents}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 6 }}>
+                        {item.hashtags.map((tag, idx) => (
+                            <TouchableOpacity
+                                key={`${idx}`}
+                                onPress={() => handleClickHashtag(tag)}>
+                                <Text
+                                    style={{
+                                        paddingVertical: 4,
+                                        paddingHorizontal: 8,
+                                        marginRight: 8,
+                                        fontSize: 14,
+                                        color: '#5762D5',
+                                        backgroundColor: '#fdf5ff',
+                                        borderRadius: 30,
+                                    }}>
+                                    # {tag}
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
                 </View>
             </View>
         );

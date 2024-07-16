@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
@@ -9,20 +9,81 @@ import {
     StyleSheet,
     Dimensions,
     Keyboard,
+    FlatList,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
-const searchIcon = require('../../assets/icons/search.png');
 const keywordDeleteIcon = require('../../assets/icons/keywordDelete.png');
+const hashtagIcon = require('../../assets/icons/hashtag.png');
 
 const SearchList = () => {
     const [keyword, setKeyword] = useState('');
+    const [recentSearches, setRecentSearches] = useState([]);
+
+    useEffect(() => {
+        loadRecentSearches();
+    }, []);
+
+    const loadRecentSearches = async () => {
+        try {
+            const searches = await AsyncStorage.getItem('recentSearches');
+            if (searches !== null) {
+                setRecentSearches(JSON.parse(searches));
+            }
+        } catch (error) {
+            console.error('Failed to load recent searches', error);
+        }
+    };
+
+    const saveRecentSearch = async search => {
+        try {
+            const updatedSearches = [
+                search,
+                ...recentSearches.filter(item => item !== search),
+            ].slice(0, 10);
+            await AsyncStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
+            setRecentSearches(updatedSearches);
+        } catch (error) {
+            console.error('Failed to save recent search', error);
+        }
+    };
+
+    const removeRecentSearch = async search => {
+        try {
+            const updatedSearches = recentSearches.filter(item => item !== search);
+            await AsyncStorage.setItem('recentSearches', JSON.stringify(updatedSearches));
+            setRecentSearches(updatedSearches);
+        } catch (error) {
+            console.error('Failed to remove recent search', error);
+        }
+    };
+
+    const handleSearch = () => {
+        if (keyword.trim()) {
+            saveRecentSearch(keyword.trim());
+            console.log('검색 API 호출:', keyword.trim());
+            setKeyword('');
+        }
+    };
 
     const handleCancelButton = () => {
         setKeyword('');
         Keyboard.dismiss();
     };
+
+    const renderRecentSearchItem = ({ item }) => (
+        <View style={styles.recentKeywordRow}>
+            <TouchableOpacity style={styles.recentKeywordUser} onPress={() => setKeyword(item)}>
+                <Image source={hashtagIcon} style={{ width: 24, height: 24 }} />
+                <Text>{item}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => removeRecentSearch(item)}>
+                <Image source={keywordDeleteIcon} style={{ width: 24, height: 24 }} />
+            </TouchableOpacity>
+        </View>
+    );
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
@@ -31,7 +92,7 @@ const SearchList = () => {
                     <View style={styles.searchWrapper}>
                         <View style={styles.searchSection}>
                             <TouchableOpacity style={styles.searchIconStyle}>
-                                <Image source={searchIcon} style={{ width: 24, height: 24 }} />
+                                <Image source={hashtagIcon} style={{ width: 24, height: 24 }} />
                             </TouchableOpacity>
                             <TextInput
                                 returnKeyType="search"
@@ -43,10 +104,11 @@ const SearchList = () => {
                                 allowFontScaling={false}
                                 style={styles.inputStyle}
                                 autoFocus
-                                onSubmitEditing={() => console.log('검색 api 호출')}
+                                onSubmitEditing={handleSearch}
+                                placeholder="해시태그 검색"
                             />
                         </View>
-                        <TouchableOpacity onPress={() => handleCancelButton()}>
+                        <TouchableOpacity onPress={handleCancelButton}>
                             <Text style={styles.cancelText}>취소</Text>
                         </TouchableOpacity>
                     </View>
@@ -54,27 +116,15 @@ const SearchList = () => {
                 <View>
                     <View style={styles.recentKeywordContainer}>
                         <Text style={styles.recentKeywordLabel}>최근 검색어</Text>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => setRecentSearches([])}>
                             <Text style={styles.allDeleteLabel}>전체삭제</Text>
                         </TouchableOpacity>
                     </View>
-                    <View>
-                        <View style={styles.recentKeywordRow}>
-                            <TouchableOpacity style={styles.recentKeywordUser}>
-                                <Image
-                                    source={{ uri: 'https://picsum.photos/130/130' }}
-                                    style={{ width: 40, height: 40, borderRadius: 20 }}
-                                />
-                                <Text>Lucymartin_3</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity>
-                                <Image
-                                    source={keywordDeleteIcon}
-                                    style={{ width: 40, height: 40 }}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+                    <FlatList
+                        data={recentSearches}
+                        renderItem={renderRecentSearchItem}
+                        keyExtractor={(item, index) => index.toString()}
+                    />
                 </View>
             </View>
         </SafeAreaView>
