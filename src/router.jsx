@@ -18,16 +18,33 @@ import Follower from './pages/mypage/Follower';
 import Settings from './pages/mypage/Settings';
 import ProfileEdit from './pages/mypage/ProfileEdit';
 import AccountSetting from './pages/mypage/AccountSetting';
+import { useNavigationState } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const renderTabBar = props => <CustomBottomTab {...props} />;
+const getActiveRouteName = state => {
+    const route = state.routes[state.index];
+    if (route.state) {
+        return getActiveRouteName(route.state);
+    }
+    return route.name;
+};
 
 // 메인 탭 네비게이터
 const MainTab = () => {
+    const state = useNavigationState(state => state);
+    const currentRouteName = getActiveRouteName(state);
+
     return (
-        <Tab.Navigator tabBar={renderTabBar} screenOptions={{ headerShown: false }}>
+        <Tab.Navigator
+            tabBar={props => {
+                if (currentRouteName === 'DmDetail') {
+                    return null;
+                }
+                return <CustomBottomTab {...props} />;
+            }}
+            screenOptions={{ headerShown: false }}>
             <Tab.Screen name="홈" component={HomeStack} />
             <Tab.Screen name="검색" component={SearchStack} />
             <Tab.Screen name="추가" component={PostFeed} />
