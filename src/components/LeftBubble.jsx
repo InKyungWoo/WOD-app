@@ -1,5 +1,26 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
+
+const MessageBubble = ({ message }) => {
+    if (message.image) {
+        return (
+            <Image
+                source={{ uri: message.image }}
+                style={{ width: 200, height: 200, borderRadius: 10 }}
+            />
+        );
+    } else if (message.audio) {
+        return (
+            <TouchableOpacity
+                onPress={() => {
+                    /* 오디오 재생 로직..나중에..*/
+                }}>
+                <Text>음성 메시지 재생</Text>
+            </TouchableOpacity>
+        );
+    }
+    return <Text style={styles.messageText}>{message.text}</Text>;
+};
 
 const LeftBubble = ({ message, prevMessage, nextMessage }) => {
     const showInfo = !nextMessage || nextMessage.sender !== 'other';
@@ -7,7 +28,7 @@ const LeftBubble = ({ message, prevMessage, nextMessage }) => {
     return (
         <View style={styles.container}>
             <View style={styles.messageContainer}>
-                <Text style={styles.messageText}>{message.text}</Text>
+                <MessageBubble message={message} />
             </View>
             {showInfo && (
                 <View style={styles.infoWrapper}>

@@ -15,6 +15,8 @@ import {
 import Modal from 'react-native-modal';
 import ImagePicker from 'react-native-image-crop-picker';
 import BasicHeader from '../../components/BasicHeader';
+import AudioRecorderPlayer from 'react-native-audio-recorder-player';
+import dayjs from 'dayjs';
 
 import LeftBubble from '../../components/LeftBubble';
 import RightBubble from '../../components/RightBubble';
@@ -26,7 +28,13 @@ const voiceButton = require('../../assets/icons/chatmodal/voiceButton.png');
 
 // 더미 메시지 데이터
 const dummyMessages = [
-    { id: '1', text: '안녕하세요!', sender: 'other', time: '14:30', isRead: true },
+    {
+        id: '1',
+        text: '안녕하세요!',
+        sender: 'other',
+        time: '14:30',
+        isRead: true,
+    },
     {
         id: '2',
         text: '네, 안녕하세요. 무슨 일이신가요?',
@@ -36,12 +44,39 @@ const dummyMessages = [
     },
     {
         id: '3',
-        text: '프로젝트 관련해서 질문이 있어요.',
+        image: 'https://picsum.photos/400/300',
         sender: 'other',
         time: '14:32',
         isRead: true,
     },
-    { id: '4', text: '네, 어떤 질문인가요?', sender: 'me', time: '14:33', isRead: false },
+    {
+        id: '4',
+        text: '프로젝트 관련 이미지를 보내드렸어요. 확인 부탁드립니다.',
+        sender: 'other',
+        time: '14:32',
+        isRead: true,
+    },
+    {
+        id: '5',
+        text: '네, 확인해보겠습니다. 잠시만 기다려주세요.',
+        sender: 'me',
+        time: '14:33',
+        isRead: false,
+    },
+    {
+        id: '6',
+        audio: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+        sender: 'me',
+        time: '14:35',
+        isRead: false,
+    },
+    {
+        id: '7',
+        text: '음성 메시지로 설명을 드렸습니다. 들어보시고 추가 질문 있으시면 말씀해주세요.',
+        sender: 'me',
+        time: '14:35',
+        isRead: false,
+    },
 ];
 
 const { width } = Dimensions.get('window');
@@ -49,15 +84,30 @@ const { width } = Dimensions.get('window');
 const DmDetail = ({ route, navigation }) => {
     const { username } = route.params;
     const [modalVisible, setModalVisible] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [messages, setMessages] = useState(dummyMessages);
+    const [inputText, setInputText] = useState('');
+    const audioRecorderPlayer = new AudioRecorderPlayer();
+
+    const sendMessage = (content, type = 'text') => {
+        const newMessage = {
+            id: Date.now().toString(),
+            sender: 'me',
+            time: dayjs().format('HH:mm'),
+            isRead: false,
+            [type]: content,
+        };
+        setMessages(prevMessages => [...prevMessages, newMessage]);
+        setModalVisible(false);
+    };
 
     const goToCameraRoll = () => {
         ImagePicker.openPicker({
             width: 300,
             height: 400,
             cropping: true,
-            multiple: true,
         }).then(image => {
-            console.log(image);
+            sendMessage(image.path, 'image');
         });
     };
 
@@ -67,20 +117,46 @@ const DmDetail = ({ route, navigation }) => {
             height: 400,
             cropping: false,
         }).then(image => {
-            console.log(image);
+            sendMessage(image.path, 'image');
         });
     };
 
+    const onStartRecord = async () => {
+        setIsRecording(true);
+        const result = await audioRecorderPlayer.startRecorder();
+        audioRecorderPlayer.addRecordBackListener(e => {
+            // 녹음 진행 상황
+        });
+    };
+
+    const onStopRecord = async () => {
+        setIsRecording(false);
+        const result = await audioRecorderPlayer.stopRecorder();
+        audioRecorderPlayer.removeRecordBackListener();
+        sendMessage(result, 'audio');
+    };
+
     const renderMessage = ({ item, index }) => {
-        const prevMessage = index > 0 ? dummyMessages[index - 1] : null;
-        const nextMessage = index < dummyMessages.length - 1 ? dummyMessages[index + 1] : null;
+        const prevMessage = index < messages.length - 1 ? messages[index + 1] : null;
+        const nextMessage = index > 0 ? messages[index - 1] : null;
 
         if (item.sender === 'me') {
             return (
-                <RightBubble message={item} prevMessage={prevMessage} nextMessage={nextMessage} />
+                <RightBubble
+                    message={item}
+                    prevMessage={prevMessage}
+                    nextMessage={nextMessage}
+                    onAudioPress={audioUri => audioRecorderPlayer.startPlayer(audioUri)}
+                />
             );
         } else {
-            return <LeftBubble message={item} prevMessage={prevMessage} />;
+            return (
+                <LeftBubble
+                    message={item}
+                    prevMessage={prevMessage}
+                    onAudioPress={audioUri => audioRecorderPlayer.startPlayer(audioUri)}
+                />
+            );
         }
     };
 
@@ -92,7 +168,7 @@ const DmDetail = ({ route, navigation }) => {
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
                 <BasicHeader title={username} />
                 <FlatList
-                    data={dummyMessages}
+                    data={messages}
                     renderItem={renderMessage}
                     keyExtractor={item => item.id}
                     contentContainerStyle={styles.messageList}
@@ -105,7 +181,18 @@ const DmDetail = ({ route, navigation }) => {
                         style={styles.plusButton}>
                         <Image source={plusIcon} style={{ width: 12, height: 12 }} />
                     </TouchableOpacity>
-                    <TextInput placeholder="메세지 입력하기" style={styles.textInput} />
+                    <TextInput
+                        placeholder="메세지 입력하기"
+                        style={styles.textInput}
+                        value={inputText}
+                        onChangeText={setInputText}
+                        onSubmitEditing={() => {
+                            if (inputText.trim()) {
+                                sendMessage(inputText.trim());
+                                setInputText('');
+                            }
+                        }}
+                    />
                 </View>
             </KeyboardAvoidingView>
 
@@ -120,11 +207,7 @@ const DmDetail = ({ route, navigation }) => {
                 backdropOpacity={0}
                 style={{ margin: 0, justifyContent: 'flex-end', alignItems: 'flex-end' }}>
                 <View style={{ width, backgroundColor: '#eceefb', paddingTop: 10, height: 200 }}>
-                    <View
-                        style={{
-                            padding: 16,
-                            flexDirection: 'row',
-                        }}>
+                    <View style={{ padding: 16, flexDirection: 'row' }}>
                         <TouchableOpacity
                             onPress={() => setModalVisible(!modalVisible)}
                             style={styles.plusButton}>
@@ -136,28 +219,24 @@ const DmDetail = ({ route, navigation }) => {
                         <TextInput placeholder="메세지 입력하기" style={styles.textInput} />
                     </View>
 
-                    <View
-                        style={{
-                            flexDirection: 'row',
-                            marginTop: 12,
-                            marginHorizontal: 80,
-                            justifyContent: 'space-between',
-                        }}>
-                        <TouchableOpacity
-                            onPress={() => goToCameraRoll()}
-                            style={styles.buttonWrapper}>
+                    <View style={styles.modalButtonContainer}>
+                        <TouchableOpacity onPress={goToCameraRoll} style={styles.buttonWrapper}>
                             <Image source={photoButton} style={styles.modalButtons} />
                             <Text style={styles.modalButtonText}>앨범</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => handleCamera()}
-                            style={styles.buttonWrapper}>
+
+                        <TouchableOpacity onPress={handleCamera} style={styles.buttonWrapper}>
                             <Image source={cameraButton} style={styles.modalButtons} />
                             <Text style={styles.modalButtonText}>카메라</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.buttonWrapper}>
+
+                        <TouchableOpacity
+                            onPress={isRecording ? onStopRecord : onStartRecord}
+                            style={styles.buttonWrapper}>
                             <Image source={voiceButton} style={styles.modalButtons} />
-                            <Text style={styles.modalButtonText}>음성녹음</Text>
+                            <Text style={styles.modalButtonText}>
+                                {isRecording ? '녹음 중지' : '음성녹음'}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -193,6 +272,12 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         flex: 1,
         paddingHorizontal: 12,
+    },
+    modalButtonContainer: {
+        flexDirection: 'row',
+        marginTop: 12,
+        marginHorizontal: 80,
+        justifyContent: 'space-between',
     },
     buttonWrapper: {
         justifyContent: 'center',
