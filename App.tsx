@@ -3,12 +3,15 @@ import 'react-native-gesture-handler';
 import Router from './src/router';
 
 import { NavigationContainer } from '@react-navigation/native';
+import { AuthProvider } from './src/context/AuthContext';
 
 function App(): React.JSX.Element {
     return (
-        <NavigationContainer>
-            <Router />
-        </NavigationContainer>
+        <AuthProvider>
+            <NavigationContainer>
+                <Router />
+            </NavigationContainer>
+        </AuthProvider>
     );
 }
 

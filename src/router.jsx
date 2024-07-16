@@ -1,10 +1,16 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import CustomBottomTab from './components/CustomBottomTab';
+import { useAuth } from './context/AuthContext';
 
 // 초기 화면
 import Splash from './pages/Splash';
+
+// 인증 화면
+import Login from './pages/auth/Login';
+import SignIn from './pages/auth/SignIn';
 
 // 메인 탭 화면
 import FeedHome from './pages/home/FeedHome';
@@ -54,6 +60,14 @@ const MainTab = () => {
     );
 };
 
+// 인증 스택
+const AuthStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="SignIn" component={SignIn} />
+    </Stack.Navigator>
+);
+
 // 홈 탭
 const HomeStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -90,10 +104,19 @@ const MyPageStack = () => (
 
 // 루트 네비게이터
 const Router = () => {
+    const { user, isLoading } = useAuth();
+
+    if (isLoading) {
+        return <Splash />;
+    }
+
     return (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Splash" component={Splash} />
-            <Stack.Screen name="MainTab" component={MainTab} />
+            {user ? (
+                <Stack.Screen name="MainTab" component={MainTab} />
+            ) : (
+                <Stack.Screen name="Auth" component={AuthStack} />
+            )}
         </Stack.Navigator>
     );
 };
