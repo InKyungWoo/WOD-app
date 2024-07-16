@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
     SafeAreaView,
     View,
@@ -17,6 +17,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import BasicHeader from '../../components/BasicHeader';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import dayjs from 'dayjs';
+import { useFocusEffect } from '@react-navigation/native';
 
 import LeftBubble from '../../components/LeftBubble';
 import RightBubble from '../../components/RightBubble';
@@ -51,27 +52,34 @@ const dummyMessages = [
     },
     {
         id: '4',
-        text: '프로젝트 관련 이미지를 보내드렸어요. 확인 부탁드립니다.',
+        audio: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
+        sender: 'other',
+        time: '14:35',
+        isRead: false,
+    },
+    {
+        id: '5',
+        text: '프로젝트 관련 파일 보내드렸어요. 확인 부탁드립니다.',
         sender: 'other',
         time: '14:32',
         isRead: true,
     },
     {
-        id: '5',
+        id: '6',
         text: '네, 확인해보겠습니다. 잠시만 기다려주세요.',
         sender: 'me',
         time: '14:33',
-        isRead: false,
+        isRead: true,
     },
     {
-        id: '6',
+        id: '7',
         audio: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
         sender: 'me',
         time: '14:35',
         isRead: false,
     },
     {
-        id: '7',
+        id: '8',
         text: '음성 메시지로 설명을 드렸습니다. 들어보시고 추가 질문 있으시면 말씀해주세요.',
         sender: 'me',
         time: '14:35',
@@ -87,7 +95,42 @@ const DmDetail = ({ route, navigation }) => {
     const [isRecording, setIsRecording] = useState(false);
     const [messages, setMessages] = useState(dummyMessages);
     const [inputText, setInputText] = useState('');
-    const audioRecorderPlayer = new AudioRecorderPlayer();
+    const [playingAudio, setPlayingAudio] = useState(null);
+    const audioRecorderPlayer = useRef(new AudioRecorderPlayer()).current;
+
+    useFocusEffect(
+        React.useCallback(() => {
+            return () => {
+                // 화면을 벗어날 때 오디오 정지
+                if (playingAudio) {
+                    audioRecorderPlayer.stopPlayer();
+                    setPlayingAudio(null);
+                }
+            };
+        }, [playingAudio]),
+    );
+
+    const handleAudioPress = async audioUri => {
+        if (playingAudio === audioUri) {
+            // 현재 재생 중인 오디오 정지
+            await audioRecorderPlayer.stopPlayer();
+            setPlayingAudio(null);
+        } else {
+            if (playingAudio) {
+                await audioRecorderPlayer.stopPlayer();
+            }
+            await audioRecorderPlayer.startPlayer(audioUri);
+            setPlayingAudio(audioUri);
+
+            // 재생이 끝나면 상태 초기화
+            audioRecorderPlayer.addPlayBackListener(e => {
+                if (e.currentPosition === e.duration) {
+                    audioRecorderPlayer.stopPlayer();
+                    setPlayingAudio(null);
+                }
+            });
+        }
+    };
 
     const sendMessage = (content, type = 'text') => {
         const newMessage = {
@@ -125,7 +168,7 @@ const DmDetail = ({ route, navigation }) => {
         setIsRecording(true);
         const result = await audioRecorderPlayer.startRecorder();
         audioRecorderPlayer.addRecordBackListener(e => {
-            // 녹음 진행 상황
+            console.log('음성 녹음 시작!');
         });
     };
 
@@ -146,7 +189,8 @@ const DmDetail = ({ route, navigation }) => {
                     message={item}
                     prevMessage={prevMessage}
                     nextMessage={nextMessage}
-                    onAudioPress={audioUri => audioRecorderPlayer.startPlayer(audioUri)}
+                    onAudioPress={handleAudioPress}
+                    isPlaying={playingAudio === item.audio}
                 />
             );
         } else {
@@ -154,7 +198,8 @@ const DmDetail = ({ route, navigation }) => {
                 <LeftBubble
                     message={item}
                     prevMessage={prevMessage}
-                    onAudioPress={audioUri => audioRecorderPlayer.startPlayer(audioUri)}
+                    onAudioPress={handleAudioPress}
+                    isPlaying={playingAudio === item.audio}
                 />
             );
         }

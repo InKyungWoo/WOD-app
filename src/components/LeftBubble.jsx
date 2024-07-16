@@ -1,7 +1,17 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const MessageBubble = ({ message }) => {
+const AudioMessage = ({ audioUri, onPress, isPlaying }) => {
+    return (
+        <TouchableOpacity onPress={() => onPress(audioUri)}>
+            <Text style={styles.audioText}>
+                {isPlaying ? '음성 메시지 정지' : '음성 메시지 재생'}
+            </Text>
+        </TouchableOpacity>
+    );
+};
+
+const MessageBubble = ({ message, onAudioPress, isPlaying }) => {
     if (message.image) {
         return (
             <Image
@@ -11,24 +21,23 @@ const MessageBubble = ({ message }) => {
         );
     } else if (message.audio) {
         return (
-            <TouchableOpacity
-                onPress={() => {
-                    /* 오디오 재생 로직..나중에..*/
-                }}>
-                <Text>음성 메시지 재생</Text>
-            </TouchableOpacity>
+            <AudioMessage audioUri={message.audio} onPress={onAudioPress} isPlaying={isPlaying} />
         );
     }
     return <Text style={styles.messageText}>{message.text}</Text>;
 };
 
-const LeftBubble = ({ message, prevMessage, nextMessage }) => {
+const LeftBubble = ({ message, prevMessage, nextMessage, onAudioPress, isPlaying }) => {
     const showInfo = !nextMessage || nextMessage.sender !== 'other';
 
     return (
         <View style={styles.container}>
             <View style={styles.messageContainer}>
-                <MessageBubble message={message} />
+                <MessageBubble
+                    message={message}
+                    onAudioPress={onAudioPress}
+                    isPlaying={isPlaying}
+                />
             </View>
             {showInfo && (
                 <View style={styles.infoWrapper}>
@@ -55,6 +64,12 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: '#414141',
         lineHeight: 22.5,
+    },
+    audioText: {
+        fontSize: 15,
+        color: '#414141',
+        lineHeight: 22.5,
+        textDecorationLine: 'underline',
     },
     infoWrapper: {
         flexDirection: 'row',

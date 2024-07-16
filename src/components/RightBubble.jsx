@@ -1,7 +1,17 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const MessageBubble = ({ message, onAudioPress }) => {
+const AudioMessage = ({ audioUri, onPress, isPlaying }) => {
+    return (
+        <TouchableOpacity onPress={() => onPress(audioUri)}>
+            <Text style={styles.audioText}>
+                {isPlaying ? '음성 메시지 정지' : '음성 메시지 재생'}
+            </Text>
+        </TouchableOpacity>
+    );
+};
+
+const MessageBubble = ({ message, onAudioPress, isPlaying }) => {
     if (message.image) {
         return (
             <Image
@@ -11,15 +21,13 @@ const MessageBubble = ({ message, onAudioPress }) => {
         );
     } else if (message.audio) {
         return (
-            <TouchableOpacity onPress={() => onAudioPress(message.audio)}>
-                <Text style={styles.audioText}>음성 메시지 재생</Text>
-            </TouchableOpacity>
+            <AudioMessage audioUri={message.audio} onPress={onAudioPress} isPlaying={isPlaying} />
         );
     }
     return <Text style={styles.messageText}>{message.text}</Text>;
 };
 
-const RightBubble = ({ message, prevMessage, nextMessage, onAudioPress }) => {
+const RightBubble = ({ message, prevMessage, nextMessage, onAudioPress, isPlaying }) => {
     const showInfo = !nextMessage || nextMessage.sender !== 'me';
 
     return (
@@ -32,7 +40,11 @@ const RightBubble = ({ message, prevMessage, nextMessage, onAudioPress }) => {
                 </View>
             )}
             <View style={styles.messageContainer}>
-                <MessageBubble message={message} onAudioPress={onAudioPress} />
+                <MessageBubble
+                    message={message}
+                    onAudioPress={onAudioPress}
+                    isPlaying={isPlaying}
+                />
             </View>
         </View>
     );
