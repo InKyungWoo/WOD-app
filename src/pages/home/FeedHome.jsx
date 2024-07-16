@@ -8,7 +8,7 @@ import {
     FlatList,
     Dimensions,
 } from 'react-native';
-import BasicHeader from '../../components/BasicHeader';
+import CommentsModal from '../../components/CommentsModal';
 
 const logo = require('../../assets/logo.png');
 const heart = require('../../assets/icons/heart.png');
@@ -147,7 +147,7 @@ const FeedHome = () => {
                         </View>
                     )}
                 />
-                {/* <CommentsModal isVisible={isVisible} setIsVisible={setIsVisible} /> */}
+                <CommentsModal isVisible={isVisible} setIsVisible={setIsVisible} />
             </View>
         </SafeAreaView>
     );
