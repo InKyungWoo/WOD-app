@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
@@ -18,6 +18,7 @@ import BasicHeader from '../../components/BasicHeader';
 import AudioRecorderPlayer from 'react-native-audio-recorder-player';
 import dayjs from 'dayjs';
 import { useFocusEffect } from '@react-navigation/native';
+import { dummyChats } from '../../apis/dummyChats';
 
 import LeftBubble from '../../components/LeftBubble';
 import RightBubble from '../../components/RightBubble';
@@ -27,76 +28,30 @@ const photoButton = require('../../assets/icons/chatmodal/photoButton.png');
 const cameraButton = require('../../assets/icons/chatmodal/cameraButton.png');
 const voiceButton = require('../../assets/icons/chatmodal/voiceButton.png');
 
-// 더미 메시지 데이터
-const dummyMessages = [
-    {
-        id: '1',
-        text: '안녕하세요!',
-        sender: 'other',
-        time: '14:30',
-        isRead: true,
-    },
-    {
-        id: '2',
-        text: '네, 안녕하세요. 무슨 일이신가요?',
-        sender: 'me',
-        time: '14:31',
-        isRead: true,
-    },
-    {
-        id: '3',
-        image: 'https://picsum.photos/400/300',
-        sender: 'other',
-        time: '14:32',
-        isRead: true,
-    },
-    {
-        id: '4',
-        audio: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
-        sender: 'other',
-        time: '14:35',
-        isRead: false,
-    },
-    {
-        id: '5',
-        text: '프로젝트 관련 파일 보내드렸어요. 확인 부탁드립니다.',
-        sender: 'other',
-        time: '14:32',
-        isRead: true,
-    },
-    {
-        id: '6',
-        text: '네, 확인해보겠습니다. 잠시만 기다려주세요.',
-        sender: 'me',
-        time: '14:33',
-        isRead: true,
-    },
-    {
-        id: '7',
-        audio: 'https://www.learningcontainer.com/wp-content/uploads/2020/02/Kalimba.mp3',
-        sender: 'me',
-        time: '14:35',
-        isRead: false,
-    },
-    {
-        id: '8',
-        text: '음성 메시지로 설명을 드렸습니다. 들어보시고 추가 질문 있으시면 말씀해주세요.',
-        sender: 'me',
-        time: '14:35',
-        isRead: false,
-    },
-];
-
 const { width } = Dimensions.get('window');
 
 const DmDetail = ({ route, navigation }) => {
-    const { username } = route.params;
+    const { userId } = route.params;
+    const chatData = dummyChats.find(chat => chat.id === userId);
+    const [messages, setMessages] = useState([]);
+    const [userName, setUserName] = useState('');
+
     const [modalVisible, setModalVisible] = useState(false);
     const [isRecording, setIsRecording] = useState(false);
-    const [messages, setMessages] = useState(dummyMessages);
     const [inputText, setInputText] = useState('');
     const [playingAudio, setPlayingAudio] = useState(null);
     const audioRecorderPlayer = useRef(new AudioRecorderPlayer()).current;
+
+    useEffect(() => {
+        if (chatData) {
+            setMessages(chatData.messages);
+            setUserName(chatData.username);
+            navigation.setOptions({ title: chatData.username });
+        } else {
+            console.error('data가 없습니다 (userId): ', userId);
+            navigation.setOptions({ title: 'Chat' });
+        }
+    }, [chatData, userId, navigation]);
 
     useFocusEffect(
         React.useCallback(() => {
@@ -211,7 +166,7 @@ const DmDetail = ({ route, navigation }) => {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
                 keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
-                <BasicHeader title={username} />
+                <BasicHeader title={userName} />
                 <FlatList
                     data={messages}
                     renderItem={renderMessage}
