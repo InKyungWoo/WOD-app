@@ -35,7 +35,7 @@ const PostDetail = ({ route, navigation }) => {
             await AsyncStorage.setItem('userPosts', JSON.stringify(posts));
 
             Alert.alert('성공', '게시물이 업로드되었습니다.', [
-                { text: 'OK', onPress: () => navigation.navigate('MyPage') },
+                { text: 'OK', onPress: () => navigation.navigate('마이페이지') },
             ]);
         } catch (error) {
             console.error('Error posting:', error);
