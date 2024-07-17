@@ -22,21 +22,24 @@ const Login = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
+        setLoading(true);
         try {
             const res = await loginAPI({ email, password });
-            if (res.ok) {
-                const userToken = res.headers['set-cookie'][0];
-                await setUserToken('userToken', userToken);
-                login(userToken); // AuthContext의 login 함수 호출
+            console.log('Login response:', res);
+            if (res.success) {
+                await setUserToken('userToken', res.token);
+                await login(res.token); // AuthContext의 login 함수 호출
                 Alert.alert('로그인 성공', '로그인이 완료되었습니다.', [
                     { text: '확인', onPress: () => navigation.navigate('MainTab') },
                 ]);
             } else {
-                Alert.alert('로그인 실패', '이메일 또는 비밀번호를 확인해주세요.');
+                Alert.alert('로그인 실패', res.error || '이메일 또는 비밀번호를 확인해주세요.');
             }
         } catch (error) {
-            console.log('Failed to login', error);
+            console.error('Failed to login', error);
             Alert.alert('오류', '로그인 중 오류가 발생했습니다.');
+        } finally {
+            setLoading(false);
         }
     };
 

@@ -28,8 +28,10 @@ export const AuthProvider = ({ children }) => {
         try {
             await setUserToken('userToken', userToken);
             setUser(userToken);
+            return true;
         } catch (error) {
             console.log('Failed to login', error);
+            return false;
         }
     };
 

@@ -20,14 +20,16 @@ export const signin = async data => {
 export const login = async user => {
     try {
         const response = await API.post('/auth', user);
+        console.log('Login API response:', response);
         if (response.ok) {
-            return response.data;
+            const token = response.data.token || response.headers['set-cookie'][0];
+            return { success: true, token };
         } else {
             throw new Error(response.data.message || '로그인에 실패했습니다.');
         }
     } catch (error) {
         console.error('Login error:', error);
-        throw error;
+        return { success: false, error: error.message };
     }
 };
 
