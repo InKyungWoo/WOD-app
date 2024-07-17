@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
@@ -8,10 +8,10 @@ import {
     StyleSheet,
     ScrollView,
 } from 'react-native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BasicHeader from '../../components/BasicHeader';
 
-const myProfile = require('../../assets/images/tempProfile.png');
+const defaultProfile = require('../../assets/images/tempProfile.png');
 const myPageMenuArrow = require('../../assets/icons/myPageMenuArrow.png');
 
 const menuData = [
@@ -33,6 +33,23 @@ const menuData = [
 ];
 
 const Settings = ({ navigation }) => {
+    const [profileImage, setProfileImage] = useState(null);
+
+    useEffect(() => {
+        loadProfileImage();
+    }, []);
+
+    const loadProfileImage = async () => {
+        try {
+            const savedImage = await AsyncStorage.getItem('profileImage');
+            if (savedImage) {
+                setProfileImage(savedImage);
+            }
+        } catch (error) {
+            console.error('Error loading profile image:', error);
+        }
+    };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }}>
             <BasicHeader title={'설정'} />
@@ -41,7 +58,7 @@ const Settings = ({ navigation }) => {
                 <View style={styles.sectionContainer}>
                     <View style={{ alignItems: 'center', marginBottom: 16 }}>
                         <Image
-                            source={myProfile}
+                            source={profileImage ? { uri: profileImage } : defaultProfile}
                             style={{
                                 width: 80,
                                 height: 80,
