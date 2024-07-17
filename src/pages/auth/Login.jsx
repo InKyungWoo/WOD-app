@@ -7,29 +7,37 @@ import {
     StyleSheet,
     SafeAreaView,
     Alert,
+    ActivityIndicator,
 } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
 import LogoHeader from '../../components/LogoHeader';
+import { login as loginAPI } from '../../apis/auth';
+import { setUserToken } from '../../apis/token';
 
 const Login = ({ navigation }) => {
-    const { login } = useAuth;
+    const { login } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
-        if (!email.includes('@')) {
-            Alert.alert('유효하지 않은 이메일', '이메일 형식이 올바르지 않습니다.');
-            return;
+    const handleLogin = async () => {
+        try {
+            const res = await loginAPI({ email, password });
+            if (res.ok) {
+                const userToken = res.headers['set-cookie'][0];
+                await setUserToken('userToken', userToken);
+                login(userToken); // AuthContext의 login 함수 호출
+                Alert.alert('로그인 성공', '로그인이 완료되었습니다.', [
+                    { text: '확인', onPress: () => navigation.navigate('MainTab') },
+                ]);
+            } else {
+                Alert.alert('로그인 실패', '이메일 또는 비밀번호를 확인해주세요.');
+            }
+        } catch (error) {
+            console.log('Failed to login', error);
+            Alert.alert('오류', '로그인 중 오류가 발생했습니다.');
         }
-
-        if (password.length < 8) {
-            Alert.alert('유효하지 않은 비밀번호', '비밀번호는 8자 이상이어야 합니다.');
-            return;
-        }
-
-        // TODO: 로그인 로직
-        console.log('Login attempt with:', email, password);
     };
 
     return (
@@ -52,8 +60,15 @@ const Login = ({ navigation }) => {
                     onChangeText={setPassword}
                     secureTextEntry
                 />
-                <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>로그인</Text>
+                <TouchableOpacity
+                    style={[styles.button, loading && styles.disabledButton]}
+                    onPress={handleLogin}
+                    disabled={loading}>
+                    {loading ? (
+                        <ActivityIndicator color="#FFF" />
+                    ) : (
+                        <Text style={styles.buttonText}>로그인</Text>
+                    )}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
                     <Text style={styles.linkText}>계정이 없으신가요? 회원가입</Text>
@@ -103,6 +118,9 @@ const styles = StyleSheet.create({
     linkText: {
         color: '#5865AC',
         fontSize: 16,
+    },
+    disabledButton: {
+        backgroundColor: '#A0A0A0',
     },
 });
 

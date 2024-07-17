@@ -13,11 +13,13 @@ import {
     Dimensions,
 } from 'react-native';
 import BasicHeader from '../../components/BasicHeader';
+import { useAuth } from '../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 const saveIcon = require('../../assets/icons/save.png');
 
 const AccountSetting = ({ navigation }) => {
+    const { logout } = useAuth();
     const [contact, setContact] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,8 +31,27 @@ const AccountSetting = ({ navigation }) => {
     };
 
     const handleLogout = () => {
-        console.log('Logged out');
-        // navigation.navigate('Login');
+        Alert.alert('로그아웃', '정말 로그아웃 하시겠습니까?', [
+            {
+                text: '취소',
+                style: 'cancel',
+            },
+            {
+                text: '확인',
+                onPress: async () => {
+                    try {
+                        await logout();
+                        navigation.reset({
+                            index: 0,
+                            routes: [{ name: 'Auth' }],
+                        });
+                    } catch (error) {
+                        console.error('Logout failed', error);
+                        Alert.alert('로그아웃 실패', '로그아웃 중 오류가 발생했습니다.');
+                    }
+                },
+            },
+        ]);
     };
 
     const handleDeleteAccount = () => {
@@ -44,7 +65,7 @@ const AccountSetting = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             {/* 헤더 */}
             <View style={{ justifyContent: 'center' }}>
-                <BasicHeader title="프로필 설정" />
+                <BasicHeader title="계정 설정" />
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Image source={saveIcon} style={{ width: 36, height: 36 }} />
                 </TouchableOpacity>
