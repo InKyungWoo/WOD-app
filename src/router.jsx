@@ -15,6 +15,7 @@ import SignIn from './pages/auth/SignIn';
 // 메인 탭 화면
 import FeedHome from './pages/home/FeedHome';
 import PostFeed from './pages/postfeed/PostFeed';
+import PostDetail from './pages/postfeed/PostDetail';
 import SearchFeed from './pages/search/SearchFeed';
 import SearchList from './pages/search/SearchList';
 import DmList from './pages/dm/DmList';
@@ -53,7 +54,7 @@ const MainTab = () => {
             screenOptions={{ headerShown: false }}>
             <Tab.Screen name="홈" component={HomeStack} />
             <Tab.Screen name="검색" component={SearchStack} />
-            <Tab.Screen name="추가" component={PostFeed} />
+            <Tab.Screen name="추가" component={PostStack} />
             <Tab.Screen name="DM" component={DMStack} />
             <Tab.Screen name="마이페이지" component={MyPageStack} />
         </Tab.Navigator>
@@ -80,6 +81,14 @@ const SearchStack = () => (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="SearchFeed" component={SearchFeed} />
         <Stack.Screen name="SearchList" component={SearchList} />
+    </Stack.Navigator>
+);
+
+// post 탭
+const PostStack = () => (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="PostFeed" component={PostFeed} />
+        <Stack.Screen name="PostDetail" component={PostDetail} />
     </Stack.Navigator>
 );
 

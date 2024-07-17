@@ -16,12 +16,12 @@ const settingsIcon = require('../../assets/icons/settings.png');
 const defaultProfile = require('../../assets//images/tempProfile.png');
 
 // 임시 데이터
-const posts = Array(15)
-    .fill()
-    .map((_, index) => ({
-        id: index.toString(),
-        image: `https://picsum.photos/500/500?random=${index}`,
-    }));
+// const posts = Array(15)
+//     .fill()
+//     .map((_, index) => ({
+//         id: index.toString(),
+//         image: `https://picsum.photos/500/500?random=${index}`,
+//     }));
 
 const { width } = Dimensions.get('window');
 
@@ -29,16 +29,19 @@ const Mypage = ({ navigation }) => {
     const [profileImage, setProfileImage] = useState(null);
     const [name, setName] = useState('');
     const [bio, setBio] = useState('');
+    const [posts, setPosts] = useState([]);
 
     const loadProfileData = async () => {
         try {
             const savedImage = await AsyncStorage.getItem('profileImage');
             const savedName = await AsyncStorage.getItem('profileName');
             const savedBio = await AsyncStorage.getItem('profileBio');
+            const savedPosts = await AsyncStorage.getItem('userPosts');
 
             if (savedImage) setProfileImage(savedImage);
             if (savedName) setName(savedName);
             if (savedBio) setBio(savedBio);
+            if (savedPosts) setPosts(JSON.parse(savedPosts));
         } catch (error) {
             console.error('Error loading profile data:', error);
         }

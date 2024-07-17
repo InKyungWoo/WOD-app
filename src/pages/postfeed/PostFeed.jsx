@@ -83,7 +83,8 @@ const PostFeed = ({ navigation }) => {
                     <Image source={backArrow} style={{ width: 36, height: 36 }} />
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('PostDetail', { selectedPhoto })}>
                     <Text style={{ fontSize: 15, color: '#5762D5', fontWeight: 'bold' }}>다음</Text>
                 </TouchableOpacity>
             </View>
