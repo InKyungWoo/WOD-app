@@ -123,13 +123,12 @@ const SignIn = ({ navigation }) => {
                     )}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                    <Text style={styles.linkText}>이미 계정이 있으신가요? 로그인</Text>
+                    <Text style={styles.linkText}>이미 계정이 있으신가요?{'\n'}➡️ 로그인하기</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
@@ -151,7 +150,7 @@ const styles = StyleSheet.create({
     input: {
         width: '80%',
         height: 40,
-        borderColor: 'gray',
+        borderColor: '#b6bde3',
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
@@ -171,6 +170,8 @@ const styles = StyleSheet.create({
     linkText: {
         color: '#5865AC',
         fontSize: 16,
+        textAlign: 'center',
+        lineHeight: 24,
     },
 });
 

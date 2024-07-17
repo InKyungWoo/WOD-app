@@ -71,7 +71,7 @@ const Login = ({ navigation }) => {
                     )}
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
-                    <Text style={styles.linkText}>계정이 없으신가요? 회원가입</Text>
+                    <Text style={styles.linkText}>계정이 없으신가요?{'\n'}➡️ 회원가입</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     input: {
         width: '80%',
         height: 40,
-        borderColor: 'gray',
+        borderColor: '#b6bde3',
         borderWidth: 1,
         borderRadius: 5,
         paddingHorizontal: 10,
@@ -118,6 +118,8 @@ const styles = StyleSheet.create({
     linkText: {
         color: '#5865AC',
         fontSize: 16,
+        lineHeight: 24,
+        textAlign: 'center',
     },
     disabledButton: {
         backgroundColor: '#A0A0A0',
