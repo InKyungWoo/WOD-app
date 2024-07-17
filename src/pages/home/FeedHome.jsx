@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     SafeAreaView,
     View,
@@ -11,6 +11,7 @@ import {
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import CommentsModal from '../../components/CommentsModal';
 import LogoHeader from '../../components/LogoHeader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const logo = require('../../assets/logo.png');
 const heart_empty = require('../../assets/icons/heart_empty.png');
@@ -35,6 +36,7 @@ const dummy_feedData = [
         like: 37,
         likeUsers: [1, 2, 3],
         isLiked: false,
+        comments: [],
     },
     {
         id: 2,
@@ -49,6 +51,7 @@ const dummy_feedData = [
         like: 52,
         likeUsers: [1, 2, 3, 4],
         isLiked: false,
+        comments: [],
     },
     {
         id: 3,
@@ -65,6 +68,7 @@ const dummy_feedData = [
         like: 89,
         likeUsers: [1, 2, 3, 4, 5],
         isLiked: false,
+        comments: [],
     },
 ];
 
@@ -72,19 +76,46 @@ const FeedHome = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [activeSlide, setActiveSlide] = useState({});
     const [feeds, setFeeds] = useState(dummy_feedData);
+    const [selectedFeed, setSelectedFeed] = useState(null);
+
+    useEffect(() => {
+        loadFeeds();
+    }, []);
+
+    const loadFeeds = async () => {
+        try {
+            const savedFeeds = await AsyncStorage.getItem('feeds');
+            if (savedFeeds !== null) {
+                setFeeds(JSON.parse(savedFeeds));
+            } else {
+                // 처음 실행 시 더미 데이터 저장
+                await AsyncStorage.setItem('feeds', JSON.stringify(dummy_feedData));
+            }
+        } catch (error) {
+            console.error('Error loading feeds:', error);
+        }
+    };
+
+    const saveFeeds = async updatedFeeds => {
+        try {
+            await AsyncStorage.setItem('feeds', JSON.stringify(updatedFeeds));
+        } catch (error) {
+            console.error('Error saving feeds:', error);
+        }
+    };
 
     const toggleLike = feedId => {
-        setFeeds(prevFeeds =>
-            prevFeeds.map(feed =>
-                feed.id === feedId
-                    ? {
-                          ...feed,
-                          isLiked: !feed.isLiked,
-                          like: feed.isLiked ? feed.like - 1 : feed.like + 1,
-                      }
-                    : feed,
-            ),
+        const updatedFeeds = feeds.map(feed =>
+            feed.id === feedId
+                ? {
+                      ...feed,
+                      isLiked: !feed.isLiked,
+                      like: feed.isLiked ? feed.like - 1 : feed.like + 1,
+                  }
+                : feed,
         );
+        setFeeds(updatedFeeds);
+        saveFeeds(updatedFeeds);
     };
 
     const handleClickHashtag = tag => {
@@ -94,6 +125,19 @@ const FeedHome = () => {
 
     const renderCarouselItem = ({ item, index }) => {
         return <Image source={{ uri: item }} style={{ width, height: width }} resizeMode="cover" />;
+    };
+
+    const handleCommentPress = feed => {
+        setSelectedFeed(feed);
+        setIsVisible(true);
+    };
+
+    const updateFeed = updatedFeed => {
+        const updatedFeeds = feeds.map(feed =>
+            feed.id === updatedFeed.id ? { ...feed, ...updatedFeed } : feed,
+        );
+        setFeeds(updatedFeeds);
+        saveFeeds(updatedFeeds);
     };
 
     const renderFeed = ({ item, index }) => {
@@ -166,7 +210,7 @@ const FeedHome = () => {
                                 style={{ width: 32, height: 32 }}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={() => setIsVisible(!isVisible)}>
+                        <TouchableOpacity onPress={() => handleCommentPress(item)}>
                             <Image source={comment} style={{ width: 32, height: 32 }} />
                         </TouchableOpacity>
                     </View>
@@ -215,7 +259,12 @@ const FeedHome = () => {
                     showsVerticalScrollIndicator={false}
                     ListHeaderComponent={() => <LogoHeader />}
                 />
-                <CommentsModal isVisible={isVisible} setIsVisible={setIsVisible} />
+                <CommentsModal
+                    isVisible={isVisible}
+                    setIsVisible={setIsVisible}
+                    feed={selectedFeed}
+                    updateFeed={updateFeed}
+                />
             </View>
         </SafeAreaView>
     );

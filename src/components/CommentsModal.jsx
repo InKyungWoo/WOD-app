@@ -1,6 +1,5 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
-    SafeAreaView,
     View,
     Image,
     FlatList,
@@ -13,6 +12,7 @@ import {
     Keyboard,
 } from 'react-native';
 import Modal from 'react-native-modal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const more = require('../assets/icons/more.png');
 const addButton = require('../assets/icons/bottomtab/add_circle_off.png');
@@ -59,9 +59,52 @@ const CommentItem = ({ item, index }) => {
     );
 };
 
-const CommentsModal = ({ isVisible, setIsVisible }) => {
+const CommentsModal = ({ isVisible, setIsVisible, feed, updateFeed }) => {
     const [textValue, setTextValue] = useState('');
+    const [comments, setComments] = useState([]);
+    const [userProfile, setUserProfile] = useState(null);
     const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = useWindowDimensions();
+
+    useEffect(() => {
+        if (feed && feed.comments) {
+            setComments(feed.comments);
+        }
+        loadUserProfile();
+    }, [feed]);
+
+    const loadUserProfile = async () => {
+        try {
+            const profileName = await AsyncStorage.getItem('profileName');
+            const profileImage = await AsyncStorage.getItem('profileImage');
+            setUserProfile({
+                name: 'chacha',
+                image: profileImage || 'https://picsum.photos/60/60',
+            });
+        } catch (error) {
+            console.error('Error loading user profile:', error);
+        }
+    };
+
+    const handleAddComment = () => {
+        if (textValue.trim() === '') return;
+
+        const newComment = {
+            id: Date.now().toString(),
+            name: userProfile.name,
+            contents: textValue,
+            profileImg: userProfile.image,
+        };
+
+        const updatedComments = [...comments, newComment];
+        setComments(updatedComments);
+
+        if (updateFeed && feed) {
+            const updatedFeed = { ...feed, comments: updatedComments };
+            updateFeed(updatedFeed);
+        }
+
+        setTextValue('');
+    };
 
     const renderItem = useCallback(
         ({ item, index }) => <CommentItem item={item} index={index} />,
@@ -126,10 +169,9 @@ const CommentsModal = ({ isVisible, setIsVisible }) => {
                         </View>
                         <FlatList
                             showsVerticalScrollIndicator={false}
-                            data={dummy_comments}
+                            data={comments}
                             renderItem={renderItem}
-                            keyExtractor={item => item.id}
-                            // ListEmptyComponent={}
+                            keyExtractor={item => item.id.toString()}
                             ItemSeparatorComponent={() => <View style={{ height: 32 }} />}
                             style={{ flex: 1 }}
                         />
@@ -182,7 +224,8 @@ const CommentsModal = ({ isVisible, setIsVisible }) => {
                                 justifyContent: 'center',
                                 alignItems: 'center',
                                 marginBottom: 28,
-                            }}>
+                            }}
+                            onPress={handleAddComment}>
                             <Image source={addButton} style={{ width: 32, height: 32 }} />
                         </TouchableOpacity>
                     </View>
